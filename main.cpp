@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// BFS finds a shortest path in an unweighted graph.
 void bfs(const vector<vector<int>>& graph,
          int start,
          int destination,
@@ -55,7 +54,6 @@ void bfs(const vector<vector<int>>& graph,
     cout << "Number of Edges: " << path.size() - 1 << endl;
 }
 
-// DFS displays every building reachable from the starting building.
 void dfs(const vector<vector<int>>& graph,
          int current,
          vector<bool>& visited,
@@ -73,9 +71,7 @@ void dfs(const vector<vector<int>>& graph,
 
 int main()
 {
-    // Building indexes:
-    // 0 = Library, 1 = Gym, 2 = Dorm,
-    // 3 = Cafe, 4 = LS, 5 = Hall Moody.
+
     vector<string> buildings =
     {
         "Library",
@@ -86,7 +82,7 @@ int main()
         "Hall Moody"
     };
 
-    // Undirected campus graph represented as an adjacency list.
+    
     vector<vector<int>> graph =
     {
         {1, 4},       // Library: Gym, LS
@@ -107,10 +103,7 @@ int main()
     cout << endl;
 
     cout << endl;
-    cout << "Why BFS is better for the shortest path:" << endl;
-    cout << "BFS explores the graph one level at a time, so the first path it "
-            "finds uses the fewest edges. DFS explores one branch deeply and "
-            "does not guarantee a shortest path." << endl;
+
 
     return 0;
 }
