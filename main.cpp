@@ -5,23 +5,16 @@
 
 using namespace std;
 
-// BFS to find shortest path
-void bfs(const vector<vector<int>>& graph, int start, int destination,
+// BFS finds a shortest path in an unweighted graph.
+void bfs(const vector<vector<int>>& graph,
+         int start,
+         int destination,
          const vector<string>& buildings)
 {
-    if (graph.size() != buildings.size() ||
-        start < 0 || destination < 0 ||
-        start >= static_cast<int>(graph.size()) ||
-        destination >= static_cast<int>(graph.size()))
-    {
-        cerr << "Invalid graph or building index." << endl;
-        return;
-    }
-
     vector<bool> visited(graph.size(), false);
     vector<int> parent(graph.size(), -1);
-
     queue<int> q;
+
     visited[start] = true;
     q.push(start);
 
@@ -30,14 +23,9 @@ void bfs(const vector<vector<int>>& graph, int start, int destination,
         int current = q.front();
         q.pop();
 
-        if (current == destination)
-            break;
-
         for (int neighbor : graph[current])
         {
-            if (neighbor >= 0 &&
-                neighbor < static_cast<int>(graph.size()) &&
-                !visited[neighbor])
+            if (!visited[neighbor])
             {
                 visited[neighbor] = true;
                 parent[neighbor] = current;
@@ -46,16 +34,9 @@ void bfs(const vector<vector<int>>& graph, int start, int destination,
         }
     }
 
-    if (!visited[destination])
-    {
-        cout << "No route found." << endl;
-        return;
-    }
-
     vector<int> path;
-
-    for (int v = destination; v != -1; v = parent[v])
-        path.push_back(v);
+    for (int current = destination; current != -1; current = parent[current])
+        path.push_back(current);
 
     reverse(path.begin(), path.end());
 
@@ -63,72 +44,73 @@ void bfs(const vector<vector<int>>& graph, int start, int destination,
     cout << "Destination: " << buildings[destination] << endl;
     cout << "Shortest Route (BFS):" << endl;
 
-    for (int vertex : path)
-        cout << buildings[vertex] << " ";
+    for (size_t i = 0; i < path.size(); ++i)
+    {
+        cout << buildings[path[i]];
+        if (i + 1 < path.size())
+            cout << " -> ";
+    }
 
     cout << endl;
     cout << "Number of Edges: " << path.size() - 1 << endl;
 }
 
-// DFS from lecture slides
+// DFS displays every building reachable from the starting building.
 void dfs(const vector<vector<int>>& graph,
-         int v,
+         int current,
          vector<bool>& visited,
          const vector<string>& buildings)
 {
-    if (v < 0 || v >= static_cast<int>(graph.size()) ||
-        graph.size() != buildings.size())
+    visited[current] = true;
+    cout << buildings[current] << " ";
+
+    for (int neighbor : graph[current])
     {
-        return;
-    }
-
-    visited[v] = true;
-
-    cout << buildings[v] << " ";
-
-    for (int neighbor : graph[v])
-    {
-        if (neighbor >= 0 &&
-            neighbor < static_cast<int>(graph.size()) &&
-            !visited[neighbor])
-        {
+        if (!visited[neighbor])
             dfs(graph, neighbor, visited, buildings);
-        }
     }
 }
 
 int main()
 {
+    // Building indexes:
+    // 0 = Library, 1 = Gym, 2 = Dorm,
+    // 3 = Cafe, 4 = LS, 5 = Hall Moody.
     vector<string> buildings =
     {
         "Library",
         "Gym",
         "Dorm",
         "Cafe",
-        "LSA",
+        "LS",
         "Hall Moody"
     };
 
+    // Undirected campus graph represented as an adjacency list.
     vector<vector<int>> graph =
     {
-        {1, 4},      // Library
-        {0, 2},      // Gym
-        {1, 3, 5},   // Dorm
-        {2},         // Cafe
-        {0, 5},      // LSA
-        {4, 2}       // Hall Moody
+        {1, 4},       // Library: Gym, LS
+        {0, 4, 2},     // Gym: Library, LS, Dorm
+        {1, 5, 3},     // Dorm: Gym, Hall Moody, Cafe
+        {2},           // Cafe: Dorm
+        {0, 1, 5},     // LS: Library, Gym, Hall Moody
+        {4, 2}         // Hall Moody: LS, Dorm
     };
 
     bfs(graph, 0, 2, buildings);
 
     cout << endl;
-
     cout << "DFS Traversal:" << endl;
 
     vector<bool> visited(graph.size(), false);
     dfs(graph, 0, visited, buildings);
+    cout << endl;
 
     cout << endl;
+    cout << "Why BFS is better for the shortest path:" << endl;
+    cout << "BFS explores the graph one level at a time, so the first path it "
+            "finds uses the fewest edges. DFS explores one branch deeply and "
+            "does not guarantee a shortest path." << endl;
 
     return 0;
 }
